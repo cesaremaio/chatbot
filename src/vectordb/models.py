@@ -8,13 +8,17 @@ class StatusResponse(BaseModel):
 class CollectionsResponse(StatusResponse):
     collections: list[str]
 
+class SearchResponse(StatusResponse):
+    retrieved_vectors: Union[dict, None]
+
 class QdrantItems(BaseModel):
     id: int
     vector: list
     payload: Union[dict, None]
 
 class QdrantSearchRequest(BaseModel):
-    id: int
+    collection_name: str
+    query_vectors: list[float]    
 
 class QdrantInsertRequest(BaseModel):
     collection_name: str

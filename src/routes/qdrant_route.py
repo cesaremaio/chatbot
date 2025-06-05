@@ -1,16 +1,16 @@
-from fastapi import APIRouter, HTTPException, Request
-from typing import Any
-from src.vectordb.models import StatusResponse, CollectionsResponse, QdrantDeleteRequest, QdrantInsertRequest, QdrantSearchRequest
+from fastapi import APIRouter
+from src.vectordb.models import StatusResponse, CollectionsResponse, QdrantDeleteRequest, QdrantInsertRequest, QdrantSearchRequest, SearchResponse
 from src.vectordb.service import qdrant_service
 
-router = APIRouter(prefix="/qdrant", tags=["qdrant"])
+router = APIRouter(prefix="/qdrant", tags=["Qdrant"])
 
-# @router.post("/search")
-# async def search_qdrant(request: QdrantSearchRequest):
-#     # TODO: Implement Qdrant search logic here
-#     # Example: query = body.get("query")
-#     # result = qdrant_client.search(query)
-#     return {"message": "Search endpoint called", "body": body}
+@router.post("/search", response_model=SearchResponse)
+async def search_qdrant(request: QdrantSearchRequest):
+    try:
+        retrieved_vectors = await qdrant_service.query_points(collection_name=request.collection_name, query_vectors=request.query_vectors)
+        return SearchResponse(status="success", message="Retrieved vectors", retrieved_vectors=retrieved_vectors)
+    except Exception as e:
+        return StatusResponse(status="failed", message=f"Unable to retrieve vectors. Exception: {e}")
 
 @router.post("/upsert", response_model=StatusResponse)
 async def upsert_qdrant(request: QdrantInsertRequest):

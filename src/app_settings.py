@@ -12,5 +12,6 @@ class AppSettings:
         self.qdrant_collection = os.getenv("QDRANT_COLLECTION")
         self.qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
+        self.chatbot_api_key = os.getenv("CHATBOT_API_KEY")
 
 settings = AppSettings()

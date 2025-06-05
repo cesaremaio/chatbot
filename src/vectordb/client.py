@@ -56,10 +56,10 @@ class QdrantClient:
         selector = PointIdsList(points=ids) # type: ignore
         await self.client.delete(collection_name=collection_name, points_selector=selector)
     
-    async def search_items(
+    async def query_points(
         self,
         collection_name: str,
-        query_vector: list[float],
+        query_vectors: list[float],
         limit: int = 10,
         filter_payload: Optional[dict[str, Any]] = None
     ):
@@ -73,9 +73,10 @@ class QdrantClient:
                     ) for key, value in filter_payload.items()
                 ]
             )
-        return await self.client.search(
+        response = await self.client.query_points(
             collection_name=collection_name,
-            query_vector=query_vector,
+            query=query_vectors,
             limit=limit,
             query_filter=qdrant_filter
         )
+        return response

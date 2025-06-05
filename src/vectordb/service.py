@@ -20,21 +20,22 @@ class QdrantService:
             items=items
         )
 
-    # async def search(self, collection_name: str, query_vector: list, top_k: int = 5):
-    #     return await self.client.search(
-    #         collection_name=collection_name,
-    #         query_vector=query_vector,
-    #         top_k=top_k
-    #     )
+    async def query_points(self, collection_name: str, query_vectors: list[float], limit: int = 10):
+        try:
+            response = await self.client.query_points(
+                    collection_name=collection_name,
+                    query_vectors=query_vectors, 
+                    limit=limit
+                )
+            return response.model_dump()
+        except Exception as e:
+            raise e
 
     async def delete_collection(self, collection_name: str):
         try:
             await self.client.delete_collection(collection_name=collection_name)
         except Exception as e:
-            return 
-
-    # async def get_collection_info(self, collection_name: str):
-    #     return await self.client.get_collection_info(collection_name=collection_name)
+            raise e
     
 
 qdrant_service = QdrantService()
