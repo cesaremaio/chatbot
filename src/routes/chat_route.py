@@ -29,6 +29,13 @@ async def sse_stream(request: Request):
         try:
             while True:
                 user_message = await queue.get()
+
+                # RAG PIPELINE HERE
+
+
+
+
+
                 bot_response = await chatbot_client.invoke_model(prompt=user_message)
                 data = {
                     "type": "response",

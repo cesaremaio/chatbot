@@ -23,5 +23,6 @@ class QdrantSearchRequest(BaseModel):
 class QdrantInsertRequest(BaseModel):
     collection_name: str
     items: list[QdrantItems]
-class QdrantDeleteRequest(BaseModel):
+    
+class QdrantBaseRequest(BaseModel):
     collection_name: str

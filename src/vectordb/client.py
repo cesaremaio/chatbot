@@ -4,7 +4,7 @@ from qdrant_client.http.models import (
     VectorParams, Distance, PointStruct, Filter, FieldCondition, MatchValue, PointIdsList
 )
 from src.app_settings import settings
-from src.vectordb.models import QdrantItems, QdrantDeleteRequest, QdrantInsertRequest, QdrantSearchRequest
+from src.vectordb.models import QdrantItems
 
 class QdrantClient:
     

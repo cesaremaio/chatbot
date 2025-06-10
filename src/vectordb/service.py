@@ -1,5 +1,5 @@
 from src.vectordb.client import QdrantClient
-from src.vectordb.models import QdrantItems, QdrantDeleteRequest, QdrantInsertRequest, QdrantSearchRequest
+from src.vectordb.models import QdrantItems, QdrantBaseRequest, QdrantInsertRequest, QdrantSearchRequest
 
 class QdrantService:
     def __init__(self):
@@ -27,9 +27,21 @@ class QdrantService:
                     query_vectors=query_vectors, 
                     limit=limit
                 )
+            
             return response.model_dump()
         except Exception as e:
             raise e
+
+    async def retrieve_points(self, collection_name: str, query_vectors: list[float], limit: int = 10):
+        response = await self.query_points(collection_name, query_vectors)
+        points = response["result"]["points"]
+
+        retrieved_documents = []
+        for point in points: 
+            retrieved_documents.append(point["payload"]["full_text"])
+        return retrieved_documents
+
+
 
     async def delete_collection(self, collection_name: str):
         try:
