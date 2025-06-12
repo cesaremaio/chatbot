@@ -1,8 +1,8 @@
-from sentence_transformers import SentenceTransformer
 from sentence_transformers import CrossEncoder
-
 from src.vectordb.service import qdrant_service
 import asyncio
+
+from src.chain.embedding_service import embedding_service
 
 
 
@@ -10,14 +10,9 @@ import asyncio
 class ChainService:
     def __init__(self):
         self.collection_name="chatbot_qdrant"
-    
-    async def get_embedding(self, user_message: str):
-        embedding_model = SentenceTransformer("thenlper/gte-small")
-        embeddings = embedding_model.encode(user_message)
-        return embeddings
 
     async def retrieve(self, user_message: str) -> list[str]:
-        query_vectors = await self.get_embedding(user_message)
+        query_vectors = await embedding_service.get_embedding(user_message)
         
         if hasattr(query_vectors, "tolist"):
             query_vectors = query_vectors.tolist()
