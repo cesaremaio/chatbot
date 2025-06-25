@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from sse_starlette.sse import EventSourceResponse
-from src.inference.invoke_model import ModelClient
+from src.inference.invoke_model import chatbot_client
 import asyncio
 import json
+from loguru import logger
+from src.chain.chain_service import chain_service
+from src.inference.utils import NOT_FOUND_PROMPT
+
 router = APIRouter()
+
 
 clients = set()
 
@@ -23,7 +28,6 @@ async def sse_send(request: Request):
 async def sse_stream(request: Request):
     queue = asyncio.Queue()
     clients.add(queue)
-    chatbot_client = ModelClient()
 
     async def event_generator():
         try:
@@ -31,12 +35,17 @@ async def sse_stream(request: Request):
                 user_message = await queue.get()
 
                 # RAG PIPELINE HERE
+                text = await chain_service.full_retrieve(user_message=user_message)
+                if not text:
+                    text=NOT_FOUND_PROMPT
 
+                PROMPT = f"""
+                {text} \n
+                {user_message}
+                """
+                logger.info(f"Retrieved information: {text}")
 
-
-
-
-                bot_response = await chatbot_client.invoke_model(prompt=user_message)
+                bot_response = await chatbot_client.invoke_model(prompt=PROMPT)
                 data = {
                     "type": "response",
                     "message": bot_response.output
@@ -55,9 +64,8 @@ async def sse_stream(request: Request):
 
 @router.post("/invoke-model")
 async def invoke_model(prompt: str):
-    client = ModelClient()
     try:
-        response = await client.invoke_model(prompt=prompt)
+        response = await chatbot_client.invoke_model(prompt=prompt)
         return response.output
     except Exception as e:
         raise e

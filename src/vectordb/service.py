@@ -34,7 +34,7 @@ class QdrantService:
 
     async def retrieve_points(self, collection_name: str, query_vectors: list[float], limit: int = 10):
         response = await self.query_points(collection_name, query_vectors)
-        points = response["result"]["points"]
+        points = response["points"]
 
         retrieved_documents = []
         for point in points: 

@@ -46,7 +46,7 @@ class QdrantClient:
             PointStruct(
                 id=item.id,     
                 vector=item.vector,     
-                payload=item.payload,   
+                payload=item.payload.model_dump(),   
             )
             for item in items
         ]

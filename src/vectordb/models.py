@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Union
+from src.ingestion.models import QdrantDocument
 
 class StatusResponse(BaseModel):
     status: str
@@ -12,9 +13,9 @@ class SearchResponse(StatusResponse):
     retrieved_vectors: Union[dict, None]
 
 class QdrantItems(BaseModel):
-    id: int
+    id: str
     vector: list
-    payload: Union[dict, None]
+    payload: Union[dict, QdrantDocument, None]
 
 class QdrantSearchRequest(BaseModel):
     collection_name: str
