@@ -1,7 +1,0 @@
-- Build a vector database using Qdrant.
-- Set up a MongoDB instance (or another free alternative) for general data storage.
-- Find and use free models for:
-    - Embeddings
-    - Reranking
-    - Image ingestion
-    - Conversational AI
