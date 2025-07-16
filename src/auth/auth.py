@@ -8,10 +8,15 @@ from src.db.client import get_async_session
 from src.db.models import User
 from src.auth.config import SECRET_KEY, ALGORITHM
 
+from loguru import logger
+
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_async_session)):
+
+    logger.info(f"token backend: {token}")
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid credentials",

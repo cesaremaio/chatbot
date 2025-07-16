@@ -51,6 +51,9 @@ export class ChatBot {
     if (!message) return;
 
     this.addMessage(message, "user");
+    
+    console.log("JWT Token:", this.jwtToken);  // Controlla token
+    console.log("Invio messaggio:", message);
 
     try {
       await fetch("http://localhost:8000/sse/send", {
