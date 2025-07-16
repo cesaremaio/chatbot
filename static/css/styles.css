@@ -1,0 +1,231 @@
+/* styles.css */
+
+/* General Reset & Base */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f7f9fc;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #333;
+}
+
+/* Container for auth (login/register) */
+#authContainer {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  box-sizing: border-box;
+}
+
+/* Login and Register forms */
+#loginForm, #registerForm {
+  display: block;
+}
+
+/* Form Headings */
+#loginForm h2, #registerForm h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 24px;
+  color: #222;
+  text-align: center;
+}
+
+/* Inputs */
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  padding: 12px 0;
+  background-color: #667eea;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #556cd6;
+}
+
+/* Error messages */
+#errorMessage, #loginError, #registerError {
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 8px;
+  min-height: 20px; /* to keep space reserved */
+  text-align: center;
+}
+
+/* Toggle links below forms */
+.toggle-link {
+  color: #667eea;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  margin-top: 15px;
+  text-align: center;
+  user-select: none;
+}
+
+/* Chat container */
+.chat-container {
+  display: none;
+  flex-direction: column;
+  width: 420px;
+  height: 600px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Chat header */
+.chat-header {
+  background-color: #667eea;
+  color: white;
+  font-weight: 700;
+  font-size: 22px;
+  padding: 15px 20px;
+  user-select: none;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+/* Connection status */
+.connection-status {
+  font-size: 14px;
+  padding: 8px 20px;
+  background-color: #f0f4ff;
+  color: #666;
+  border-bottom: 1px solid #ddd;
+  user-select: none;
+}
+
+.connection-status.connected {
+  color: #2ecc71;
+}
+
+.connection-status.disconnected {
+  color: #e74c3c;
+}
+
+/* Chat messages container */
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+/* Messages */
+.message {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  max-width: 75%;
+}
+
+.message-content {
+  background-color: #e2e8f0;
+  color: #222;
+  padding: 12px 18px;
+  border-radius: 18px;
+  position: relative;
+  font-size: 15px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.message.bot .message-content {
+  background-color: #667eea;
+  color: white;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.message.user .message-content {
+  background-color: #4a90e2;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+/* Message time */
+.message-time {
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+  align-self: flex-end;
+}
+
+/* Chat input container */
+.chat-input-container {
+  display: flex;
+  padding: 12px 20px;
+  border-top: 1px solid #ddd;
+  background-color: white;
+}
+
+/* Chat input */
+.chat-input {
+  flex: 1;
+  padding: 12px 14px;
+  font-size: 16px;
+  border-radius: 24px;
+  border: 1.5px solid #ccc;
+  margin-right: 12px;
+  transition: border-color 0.3s ease;
+}
+
+.chat-input:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+/* Send button */
+.send-button {
+  background-color: #667eea;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 0 20px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.send-button:disabled {
+  background-color: #a3b0ff;
+  cursor: not-allowed;
+}
+
+.send-button:hover:not(:disabled) {
+  background-color: #556cd6;
+}

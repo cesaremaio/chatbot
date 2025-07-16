@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatBot Login & Register</title>
+  <style>
+    /* your existing styles */
+    /* ... keep existing styles ... */
+    
+    /* Add style for toggle links */
+    .toggle-link {
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 14px;
+      margin-top: 8px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container" id="authContainer">
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <h2>Login</h2>
+      <input type="text" id="loginUsername" placeholder="Username" />
+      <input type="password" id="loginPassword" placeholder="Password" />
+      <button id="loginButton">Login</button>
+      <div id="loginError" style="color: red; margin-top: 10px;"></div>
+      <div class="toggle-link" id="showRegister">Don't have an account? Register</div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none;">
+      <h2>Register</h2>
+      <input type="text" id="registerUsername" placeholder="Username" />
+      <input type="password" id="registerPassword" placeholder="Password" />
+      <button id="registerButton">Register</button>
+      <div id="registerError" style="color: red; margin-top: 10px;"></div>
+      <div class="toggle-link" id="showLogin">Already have an account? Login</div>
+    </div>
+  </div>
+
+  <div class="chat-container" style="display:none;">
+    <div class="chat-header">🤖 ChatBot Assistant</div>
+    <div class="connection-status" id="connectionStatus">Connecting...</div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">
+        <div class="message-content">
+          Hello! I'm your AI assistant. How can I help you today?
+          <div class="message-time" id="welcomeTime"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <input type="text" class="chat-input" id="messageInput" placeholder="Type your message here..." disabled />
+      <button class="send-button" id="sendButton" disabled>Send</button>
+    </div>
+  </div>
+
+<script>
+  let jwtToken = null;
+
+  // Show Register form, hide Login form
+  document.getElementById("showRegister").addEventListener("click", () => {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("registerForm").style.display = "block";
+    clearErrors();
+  });
+
+  // Show Login form, hide Register form
+  document.getElementById("showLogin").addEventListener("click", () => {
+    document.getElementById("registerForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+    clearErrors();
+  });
+
+  function clearErrors() {
+    document.getElementById("loginError").innerText = "";
+    document.getElementById("registerError").innerText = "";
+  }
+
+  async function loginUser() {
+    clearErrors();
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    const errorDiv = document.getElementById("loginError");
+
+    if (!username || !password) {
+      errorDiv.innerText = "Please fill in all fields.";
+      return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("username", username);
+    formData.append("password", password);
+
+    try {
+      const res = await fetch("http://localhost:8000/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
+
+      if (!res.ok) throw new Error("Invalid credentials");
+
+      const data = await res.json();
+      jwtToken = data.access_token;
+      localStorage.setItem("jwtToken", jwtToken);
+
+      document.getElementById("authContainer").style.display = "none";
+      document.querySelector(".chat-container").style.display = "flex";
+
+      new ChatBot();
+    } catch (err) {
+      errorDiv.innerText = "Login failed. Please check your credentials.";
+    }
+  }
+
+  async function registerUser() {
+    clearErrors();
+    const username = document.getElementById("registerUsername").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
+    const errorDiv = document.getElementById("registerError");
+
+    if (!username || !password) {
+      errorDiv.innerText = "Please fill in all fields.";
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Registration failed");
+      }
+
+      alert("Registration successful! Please login.");
+      document.getElementById("registerForm").style.display = "none";
+      document.getElementById("loginForm").style.display = "block";
+    } catch (err) {
+      errorDiv.innerText = err.message;
+    }
+  }
+
+  class ChatBot {
+    constructor() {
+      this.messageInput = document.getElementById("messageInput");
+      this.sendButton = document.getElementById("sendButton");
+      this.chatMessages = document.getElementById("chatMessages");
+      this.connectionStatus = document.getElementById("connectionStatus");
+
+      this.sendButton.addEventListener("click", () => this.sendMessage());
+      this.messageInput.addEventListener("keypress", e => {
+        if (e.key === "Enter") this.sendMessage();
+      });
+
+      this.connect();
+      this.setWelcomeTime();
+    }
+
+    connect() {
+      const eventSource = new EventSource(`http://localhost:8000/sse/stream?token=${jwtToken}`);
+
+      eventSource.onopen = () => {
+        this.updateConnectionStatus("connected", "🟢 Connected");
+        this.enableInput();
+      };
+
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "response") {
+          this.addMessage(data.message, "bot");
+        } else if (data.type === "error") {
+          this.addMessage(`Error: ${data.message}`, "bot");
+        }
+      };
+
+      eventSource.onerror = () => {
+        this.updateConnectionStatus("disconnected", "🔴 Disconnected");
+        this.disableInput();
+        eventSource.close();
+        setTimeout(() => this.connect(), 3000);
+      };
+    }
+
+    async sendMessage() {
+      const message = this.messageInput.value.trim();
+      if (!message) return;
+
+      this.addMessage(message, "user");
+
+      try {
+        await fetch("http://localhost:8000/sse/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + jwtToken,
+          },
+          body: JSON.stringify({ message }),
+        });
+      } catch (err) {
+        this.addMessage("Error sending message", "bot");
+      }
+
+      this.messageInput.value = "";
+    }
+
+    addMessage(message, sender) {
+      const wrapper = document.createElement("div");
+      wrapper.className = `message ${sender}`;
+
+      const content = document.createElement("div");
+      content.className = "message-content";
+      content.innerText = message;
+
+      const time = document.createElement("div");
+      time.className = "message-time";
+      time.innerText = new Date().toLocaleTimeString();
+
+      content.appendChild(time);
+      wrapper.appendChild(content);
+      this.chatMessages.appendChild(wrapper);
+      this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+    }
+
+    enableInput() {
+      this.messageInput.disabled = false;
+      this.sendButton.disabled = false;
+      this.messageInput.focus();
+    }
+
+    disableInput() {
+      this.messageInput.disabled = true;
+      this.sendButton.disabled = true;
+    }
+
+    updateConnectionStatus(statusClass, text) {
+      this.connectionStatus.className = `connection-status ${statusClass}`;
+      this.connectionStatus.innerText = text;
+    }
+
+    setWelcomeTime() {
+      document.getElementById("welcomeTime").innerText = new Date().toLocaleTimeString();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("loginButton").addEventListener("click", loginUser);
+    document.getElementById("registerButton").addEventListener("click", registerUser);
+
+    if (localStorage.getItem("jwtToken")) {
+      jwtToken = localStorage.getItem("jwtToken");
+      document.getElementById("authContainer").style.display = "none";
+      document.querySelector(".chat-container").style.display = "flex";
+      new ChatBot();
+    }
+  });
+</script>
+
+</body>
+</html>

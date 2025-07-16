@@ -14,4 +14,7 @@ class AppSettings:
 
         self.chatbot_api_key = os.getenv("CHATBOT_API_KEY")
 
+
+        self.database_url = os.getenv("DATABASE_URL")
+        
 settings = AppSettings()

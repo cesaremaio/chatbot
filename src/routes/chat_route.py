@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
 from sse_starlette.sse import EventSourceResponse
 from src.inference.invoke_model import chatbot_client
+from src.auth.auth import get_current_user, get_current_user_query
 import asyncio
 import json
 from loguru import logger
@@ -14,7 +15,7 @@ router = APIRouter()
 clients = set()
 
 @router.post("/sse/send")
-async def sse_send(request: Request):
+async def sse_send(request: Request, current_user=Depends(get_current_user)):
     data = await request.json()
     user_message = data.get("message")
     if not user_message:
@@ -25,7 +26,7 @@ async def sse_send(request: Request):
     return {"status": "sent"}
 
 @router.get("/sse/stream")
-async def sse_stream(request: Request):
+async def sse_stream(request: Request, current_user=Depends(get_current_user_query)):
     queue = asyncio.Queue()
     clients.add(queue)
 
