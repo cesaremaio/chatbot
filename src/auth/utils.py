@@ -58,7 +58,6 @@ async def register_user(session: AsyncSession, user_data: UserCreate):
     logger.info("Successfully registered user.")
     return new_user
 
-
 async def change_user_credentials(
     new_credentials: UserCreate,
     current_user: User = Depends(get_current_user),
