@@ -42,15 +42,20 @@ async def authenticate_user(session: AsyncSession, username: str, password: str)
     return user
 
 async def register_user(session: AsyncSession, user_data: UserCreate):
+    logger.info("Check if username already exists")
     result = await session.execute(select(User).where(User.username == user_data.username))
     if result.scalar_one_or_none():
+        logger.info("Username already exists")
         raise HTTPException(status_code=400, detail="Username already exists")
+    
+    logger.info("Username is ok, creating new user")
     new_user = User(
         username=user_data.username,
         hashed_password=get_password_hash(user_data.plain_password)
     )
     session.add(new_user)
     await session.commit()
+    logger.info("Successfully registered user.")
     return new_user
 
 

@@ -13,6 +13,16 @@ export function initAuth({ onLoginSuccess, onLogout }) {
     await handleRegister();
   });
 
+  document.getElementById("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    await handleLogin(onLoginSuccess);
+  });
+
+  document.getElementById("registerForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    await handleRegister();
+  });
+
   document.getElementById("showRegister").addEventListener("click", () => {
     toggleForms("register");
   });
@@ -58,9 +68,8 @@ async function handleLogin(onLoginSuccess) {
 async function handleRegister() {
   clearErrors("registerError");
   const username = document.getElementById("registerUsername").value.trim();
-  const password = document.getElementById("registerPassword").value.trim();
-
-  const success = await register(username, password);
+  const plain_password = document.getElementById("registerPassword").value.trim();
+  const success = await register(username, plain_password);
   if (success) {
     toggleForms("login");
     alert("Registration successful! Please login.");
