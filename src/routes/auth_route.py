@@ -30,17 +30,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
     # refresh_token = create_access_token({"sub": user.username}, timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES))
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("/auth/refresh")
-def refresh_token(refresh_token: str = Header(...)):
+@router.post("/refresh")
+async def refresh_token(refresh_token: str = Header(...)):
     try:
         new_access = refresh_access_token(refresh_token)
         return {"access_token": new_access}
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
-
-# @router.get("/protected")
-# async def protected_route(current_user=Depends(get_current_user)):
-#     return {"message": f"Welcome {current_user.username}!"}
 
 
 @router.get("/check")

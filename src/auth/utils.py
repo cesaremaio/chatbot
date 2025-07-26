@@ -60,8 +60,8 @@ async def register_user(session: AsyncSession, user_data: UserCreate):
 
 async def change_user_credentials(
     new_credentials: UserCreate,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_async_session),
+    current_user: User,
+    session: AsyncSession,
 ):
     # Check if new username is taken by someone else
     result = await session.execute(

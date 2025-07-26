@@ -15,21 +15,30 @@ function showAuthUI() {
 }
 
 let chatBotInstance = null;
+
+
+export async function onLoginSuccess(jwtToken) {
+  localStorage.setItem("jwtToken", jwtToken);
+  showChatUI();
+  chatBotInstance = new ChatBot(jwtToken);
+}
+
+export async function onLogout() {
+  console.log("onLogout is being executed")
+  // Redirect to login screen
+  window.location.href = "/";
+  showAuthUI();
+  if (chatBotInstance) {
+    chatBotInstance.eventSource.close();
+    chatBotInstance = null;
+  }
+}
+
+
 document.addEventListener("DOMContentLoaded", async () => {
   initAuth({
-    onLoginSuccess: (jwtToken) => {
-      localStorage.setItem("jwtToken", jwtToken);
-      showChatUI();
-      chatBotInstance = new ChatBot(jwtToken);
-    },
-    onLogout: () => {
-      localStorage.removeItem("jwtToken");
-      showAuthUI();
-      if (chatBotInstance) {
-        chatBotInstance.eventSource.close();
-        chatBotInstance = null;
-      }
-    }
+    onLoginSuccess: onLoginSuccess,
+    onLogout: onLogout
   });
 
   const jwtToken = localStorage.getItem("jwtToken");

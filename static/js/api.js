@@ -1,3 +1,6 @@
+import { showError } from './utils.js';
+
+
 export async function login(username, password) {
   const errorDiv = document.getElementById("loginError");
   if (!username || !password) {
@@ -29,6 +32,26 @@ export async function login(username, password) {
   }
 }
 
+export async function logout() {
+  const errorDiv = document.getElementById("logoutError");
+  if (errorDiv) errorDiv.innerText = "";
+
+  try {
+    localStorage.removeItem("jwtToken");
+
+    if (window.chatBotInstance) {
+      window.chatBotInstance.eventSource.close();
+      window.chatBotInstance = null;
+    }
+
+    return true;
+  } catch (err) {
+    if (errorDiv) errorDiv.innerText = "Logout failed.";
+    return false;
+  }
+}
+
+
 export async function register(username, plain_password) {
   const errorDiv = document.getElementById("registerError");
   if (!username || !plain_password) {
@@ -56,6 +79,32 @@ export async function register(username, plain_password) {
     return true;
   } catch (err) {
     errorDiv.innerText = err.message;
+    return false;
+  }
+}
+
+
+export async function update_credentials(new_username, new_password, token){ 
+  try {
+    const res = await fetch("http://localhost:8000/db/users/update-my-credentials", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ username: new_username, plain_password: new_password })
+    });
+
+    if (res.ok) {
+      return true;
+    } else {
+      const err = await res.json();
+      showError("updateError", err.detail || "Update failed");
+      return false;
+    }
+  } catch (err) {
+    console.error(err);
+    showError("updateError", "Network error");
     return false;
   }
 }

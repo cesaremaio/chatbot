@@ -1,4 +1,4 @@
-import { login, register } from './api.js';
+import { login, logout, register, update_credentials } from './api.js';
 import { clearErrors } from './utils.js';
 import { showError } from './utils.js';
 import { ChatBot } from './chat.js';
@@ -11,6 +11,12 @@ export function initAuth({ onLoginSuccess, onLogout }) {
 
   document.getElementById("registerButton").addEventListener("click", async () => {
     await handleRegister();
+  });
+
+  document.getElementById("logoutButton").addEventListener("click", async () => {
+    if (confirm("Are you sure you want to log out?")) {
+      await handleLogout(onLogout);
+    }
   });
 
   document.getElementById("loginForm").addEventListener("submit", async e => {
@@ -30,20 +36,44 @@ export function initAuth({ onLoginSuccess, onLogout }) {
   document.getElementById("showLogin").addEventListener("click", () => {
     toggleForms("login");
   });
+
+  document.getElementById("updateCredentialsButton").addEventListener("click", () => {
+    toggleForms("update");
+    document.querySelector(".chat-container").style.display = "none";
+    document.getElementById("authContainer").style.display = "block";
+  });
+
+  document.getElementById("updateForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    await handleUpdateCredentials();
+  });
+
+  document.getElementById("backToChat").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("authContainer").style.display = "none";
+    document.querySelector(".chat-container").style.display = "flex";
+});
+
 }
 
 function toggleForms(formToShow) {
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
+  const updateForm = document.getElementById("updateForm");
 
-  if (formToShow === "register") {
-    loginForm.style.display = "none";
-    registerForm.style.display = "block";
-  } else {
+  loginForm.style.display = "none";
+  registerForm.style.display = "none";
+  updateForm.style.display = "none";
+
+  if (formToShow === "login") {
     loginForm.style.display = "block";
-    registerForm.style.display = "none";
+  } else if (formToShow === "register") {
+    registerForm.style.display = "block";
+  } else if (formToShow === "update") {
+    updateForm.style.display = "block";
   }
 }
+
 
 async function handleLogin(onLoginSuccess) {
   clearErrors("loginError");
@@ -65,6 +95,13 @@ async function handleLogin(onLoginSuccess) {
   }
 }
 
+async function handleLogout(onLogout) {
+  const success = await logout();
+  if (success ) {
+    onLogout();
+  }
+}
+
 async function handleRegister() {
   clearErrors("registerError");
   const username = document.getElementById("registerUsername").value.trim();
@@ -77,3 +114,25 @@ async function handleRegister() {
     showError("registerError", "Registration failed. Try a different username.");
   }
 }
+
+async function handleUpdateCredentials() {
+  const newUsername = document.getElementById("updateUsername").value.trim();
+  const newPassword = document.getElementById("updatePassword").value.trim();
+
+  if (!newUsername || !newPassword) {
+    showError("updateError", "Username and password required.");
+    return;
+  }
+
+  const token = localStorage.getItem("jwtToken");
+  const success = await update_credentials(newUsername, newPassword, token);
+
+  if (success) {
+    toggleForms("login");
+    alert("Credentials updated.");
+    document.getElementById("updateUsername").value = "";
+    document.getElementById("updatePassword").value = "";
+  }
+}
+
+

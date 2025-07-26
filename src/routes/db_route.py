@@ -25,8 +25,21 @@ async def create_user(user: UserCreate, session: AsyncSession = Depends(get_asyn
     new_user = await register_user(session=session, user_data=user) # type:ignore
     return UserRead(username=new_user.username, id=new_user.id)
 
-
+# generic one
 @router.put("/users/{user_id}", response_model=UserRead)
+async def update_user_credentials(
+    new_credentials: UserCreate,
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_current_user),
+):
+    return await change_user_credentials(
+        new_credentials=new_credentials,
+        session=session,
+        current_user=current_user,
+    )
+
+# user updates its own credentials
+@router.post("/users/update-my-credentials", response_model=UserRead)
 async def update_my_credentials(
     new_credentials: UserCreate,
     session: AsyncSession = Depends(get_async_session),
@@ -37,6 +50,7 @@ async def update_my_credentials(
         session=session,
         current_user=current_user,
     )
+
 
 
 @router.delete("/users/{user_id}")
