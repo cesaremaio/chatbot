@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.routes import chat_route, db_route, qdrant_route, env_route, auth_route
+from src.routes import chat_route, db_route, qdrant_route, env_route, auth_route, ingestion_route
 from src.app_settings import settings   
 import uvicorn
 
@@ -30,6 +30,7 @@ app.include_router(qdrant_route.router)
 app.include_router(env_route.router)
 app.include_router(db_route.router)
 app.include_router(auth_route.router)
+app.include_router(ingestion_route.router)
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

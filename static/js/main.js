@@ -6,6 +6,8 @@ function showChatUI() {
   console.log("Showing chat UI");
   document.getElementById("authContainer").style.display = "none";
   document.querySelector(".chat-container").style.display = "flex"; // or "block"
+  initializeUploader(); // Initialize drag & drop functionality
+
 }
 
 function showAuthUI() {

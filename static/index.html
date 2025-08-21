@@ -42,12 +42,33 @@
       <button id="logoutButton" class="logout-button">Logout</button>
     </div>
     <div id="connectionStatus" class="connection-status disconnected">🔴 Disconnected</div>
+
+    <!-- Chat Messages Area -->
     <div id="chatMessages" class="chat-messages"></div>
-    <input id="messageInput" type="text" placeholder="Type your message here..." disabled />
-    <button id="sendButton" disabled>Send</button>
+    
+    <!-- Document Upload Zone -->
+    <div class="upload-section">
+      <div class="drop-zone" id="dropzone">
+        <div class="drop-zone-content">
+          <div class="drop-zone-icon">📁</div>
+          <div class="drop-zone-text">Drop documents to enhance your chat</div>
+          <div class="drop-zone-subtext">PDF, DOC, DOCX, TXT files supported</div>
+        </div>
+      </div>
+      <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;">
+      <div id="uploadStatus" class="upload-status"></div>
+    </div>
+
+    <!-- Chat Input Section -->
+    <div class="chat-input-section">
+      <input id="messageInput" type="text" placeholder="Type your message here..." disabled />
+      <button id="sendButton" disabled>Send</button>
+    </div>
+    
     <div id="welcomeTime"></div>
   </div>
 
+  <script src="/static/js/uploader.js"></script>
   <script src="/static/js/main.js" type="module"></script>
 </body>
 </html>

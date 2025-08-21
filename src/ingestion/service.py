@@ -108,13 +108,6 @@ class PDFIngestionService:
         
         return
 
-
-
-
-        
-
-
-
     # def upload_chunks(self, chunks: List[str]):
     #     batch = []
     #     for idx, chunk in enumerate(chunks):
@@ -130,6 +123,8 @@ class PDFIngestionService:
     # def ingest_pdf(self, pdf_path: str, chunk_size: int = 500):
     #     chunks = self.extract_text_chunks(pdf_path, chunk_size)
     #     self.upload_chunks(chunks)
+
+pdf_ingestion_service = PDFIngestionService(collection_name="chatbot_qdrant")
 
 
 async def main():
